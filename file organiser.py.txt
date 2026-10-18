@@ -1,0 +1,44 @@
+
+from pathlib import Path
+import shutil
+
+# Organise files inside this folder
+folder = Path("ToOrganise")
+
+categories = {
+    "Images": [".jpg", ".jpeg", ".png", ".gif"],
+    "Documents": [".pdf", ".docx", ".txt", ".doc"],
+    "Videos": [".mp4", ".mov", ".avi"],
+    "Music": [".mp3", ".wav"],
+    "Spreadsheets": [".xlsx", ".csv"],
+}
+
+# Create the folder if it does not exist
+folder.mkdir(exist_ok=True)
+
+# Check every file in the folder
+for file in folder.iterdir():
+    if file.is_file():
+        destination = "Others"
+
+        # Find the correct category
+        for category, extensions in categories.items():
+            if file.suffix.lower() in extensions:
+                destination = category
+                break
+
+        # Create the category folder
+        new_folder = folder / destination
+        new_folder.mkdir(exist_ok=True)
+
+        # Avoid overwriting files with the same name
+        target = new_folder / file.name
+        if target.exists():
+            print("Skipped duplicate:", file.name)
+            continue
+
+        # Move the file
+        shutil.move(str(file), str(target))
+        print("Organised:", file.name, "->", destination)
+
+print("File organisation complete!")
